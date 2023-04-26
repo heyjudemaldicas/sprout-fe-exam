@@ -18,7 +18,7 @@ export default {
 
 html,
 body {
-  font-family: "Open Sans", sans serif;
+  font-family: "Open Sans", sans-serif;
   height: 100%;
   margin: 0;
 }
