@@ -192,14 +192,20 @@ export default {
       });
     },
     sort(filterBy) {
-      if (filterBy === 1) { // Latest to oldest
-        this.announcementsData = this.announcementsData.slice().sort(function (a, b) {
-          return new Date(b.dateCreated) - new Date(a.dateCreated)
-        });
-      } else if (filterBy === 2) { // Oldest to latest
-        this.announcementsData =  this.announcementsData.slice().sort(function (a, b) {
-          return new Date(a.dateCreated) - new Date(b.dateCreated)
-        });
+      if (filterBy === 1) {
+        // Latest to oldest
+        this.announcementsData = this.announcementsData
+          .slice()
+          .sort(function (a, b) {
+            return new Date(b.dateCreated) - new Date(a.dateCreated);
+          });
+      } else if (filterBy === 2) {
+        // Oldest to latest
+        this.announcementsData = this.announcementsData
+          .slice()
+          .sort(function (a, b) {
+            return new Date(a.dateCreated) - new Date(b.dateCreated);
+          });
       }
     },
   },
