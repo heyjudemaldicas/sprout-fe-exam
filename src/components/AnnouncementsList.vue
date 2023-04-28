@@ -1,25 +1,5 @@
 <template>
   <div class="announcements-list-container">
-    <!-- <div class="header d-flex">
-      <div class="title">TITLE</div>
-      <div class="message">MESSAGE</div>
-      <div class="sent-by">SENT BY</div>
-      <div class="sent-through">SENT THROUGH</div>
-      <div class="date-created">DATE CREATED</div>
-      <div class="start-date">START DATE</div>
-      <div class="end-date">END DATE</div>
-    </div>
-    <div class="list">
-      <div class="title">ATTN: New employees</div>
-      <div class="message">In line with the updacoming team buildiing activity...</div>
-      <div class="sent-by">Roe, Ken</div>
-      <div class="sent-through">Y</div>
-      <div class="date-created">02/17/2023</div>
-      <div class="start-date">02/17/2023</div>
-      <div class="end-date">02/17/2023</div>
-    </div>
-    <div class="pagination"></div> -->
-
     <div class="table-responsive">
       <table class="table">
         <thead>
@@ -27,14 +7,20 @@
             <th class="col-md-1">TITLE</th>
             <th class="col-md-2">MESSAGE</th>
             <th class="col-md-1">SENT BY</th>
-            <th class="col-md-1">SENT THROUGH</th>
+            <th class="col-md-1">
+              SENT THROUGH
+              <font-awesome-icon
+                class="fa-icon info"
+                icon="circle-info"
+              ></font-awesome-icon>
+            </th>
             <th class="col-md-1">DATE CREATED</th>
             <th class="col-md-1">START DATE</th>
             <th class="col-md-1">END DATE</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in announcements" :key="item.id">
+          <tr v-for="item in filteredAnnouncements" :key="item.id">
             <td class="col-md-1 message">{{ item.title }}</td>
             <td class="col-md-2 message">{{ item.message }}</td>
             <td class="col-md-1">{{ item.sender }}</td>
@@ -66,7 +52,49 @@
           </tr>
         </tbody>
       </table>
-      <div class="pagination">SSS</div>
+      <div class="pagination d-flex align-items-center px-3 my-2">
+        <div class="page-item items-per-page d-flex align-items-center">
+          <span>Items per page</span>
+          <select
+            class="form-select"
+            aria-label="Filter by"
+            v-model="itemsPerPage"
+          >
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="20">20</option>
+          </select>
+        </div>
+        <div class="page-item paginate-buttons">
+          <font-awesome-icon
+            class="fa-icon cursor-pointer"
+            icon="backward-step"
+            @click="prevPage"
+          ></font-awesome-icon>
+          <font-awesome-icon
+            class="fa-icon cursor-pointer"
+            icon="caret-left"
+            @click="prevPage"
+          ></font-awesome-icon>
+          <span>Page {{ current }} of {{ length }}</span>
+          <font-awesome-icon
+            class="fa-icon cursor-pointer"
+            icon="caret-right"
+            @click="nextPage"
+          ></font-awesome-icon>
+          <font-awesome-icon
+            class="fa-icon cursor-pointer"
+            icon="forward-step"
+            @click="nextPage"
+          ></font-awesome-icon>
+        </div>
+        <div class="page-item show-count">
+          Showing {{ start }}-{{
+            end > announcements.length ? announcements.length : end
+          }}
+          of {{ announcements.length }}
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -79,10 +107,17 @@ export default {
   data() {
     return {
       announcements: [],
+      filteredAnnouncements: [],
+      current: 1,
+      itemsPerPage: 10,
+      start: 0,
+      end: 10,
+      length: 0,
     };
   },
   mounted() {
     this.getAnnouncements();
+    this.paginate();
   },
   methods: {
     getAnnouncements() {
@@ -114,6 +149,31 @@ export default {
         });
       });
     },
+    paginate() {
+      let limit = +this.itemsPerPage;
+      let start = (this.current - 1) * limit;
+      let end = start + limit;
+      this.start = start + 1;
+      this.end = end;
+
+      this.filteredAnnouncements = this.announcements?.slice(start, end);
+      this.length = Math.ceil(this.announcements.length / limit);
+    },
+    nextPage() {
+      this.length !== this.current ? this.current++ : this.current;
+    },
+    prevPage() {
+      this.current !== 1 ? this.current-- : this.current;
+    },
+  },
+  watch: {
+    itemsPerPage() {
+      this.current = 1;
+      this.paginate();
+    },
+    current() {
+      this.paginate();
+    },
   },
 };
 </script>
@@ -128,11 +188,22 @@ export default {
 
       thead {
         font-size: 12px;
+
+        tr {
+          th {
+            .info {
+              margin-left: 4px;
+              color: #146ebe;
+            }
+          }
+        }
       }
 
       tbody {
         tr {
           td {
+            vertical-align: middle;
+
             &.message {
               max-width: 0;
               overflow: hidden;
@@ -146,10 +217,44 @@ export default {
             }
 
             span > .fa-icon {
-              margin-right: 4px;
+              margin-right: 8px;
             }
           }
         }
+      }
+    }
+
+    .pagination {
+      font-size: 14px;
+
+      .page-item {
+        flex: 1;
+      }
+
+      .item-per-page {
+        display: flex;
+        justify-content: flex-start;
+      }
+
+      .form-select {
+        margin-left: 16px;
+        height: auto;
+        font-size: 14px;
+        width: auto;
+      }
+
+      .paginate-buttons {
+        display: flex;
+        justify-content: center;
+
+        .fa-icon {
+          margin: 0 8px;
+        }
+      }
+
+      .show-count {
+        display: flex;
+        justify-content: flex-end;
       }
     }
   }

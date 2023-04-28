@@ -13,6 +13,11 @@ import { faBell } from "@fortawesome/free-solid-svg-icons";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { faBookmark } from "@fortawesome/free-solid-svg-icons";
 import { faMobileScreenButton } from "@fortawesome/free-solid-svg-icons";
+import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
+import { faBackwardStep } from "@fortawesome/free-solid-svg-icons";
+import { faForwardStep } from "@fortawesome/free-solid-svg-icons";
+import { faCaretLeft } from "@fortawesome/free-solid-svg-icons";
+import { faCaretRight } from "@fortawesome/free-solid-svg-icons";
 
 /* add icons to the library */
 library.add(
@@ -20,7 +25,12 @@ library.add(
   faBell,
   faPlus,
   faBookmark,
-  faMobileScreenButton
+  faMobileScreenButton,
+  faCircleInfo,
+  faBackwardStep,
+  faForwardStep,
+  faCaretLeft,
+  faCaretRight
 );
 
 createApp(App)
