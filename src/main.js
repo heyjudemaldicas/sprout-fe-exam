@@ -11,9 +11,17 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faBookmark } from "@fortawesome/free-solid-svg-icons";
+import { faMobileScreenButton } from "@fortawesome/free-solid-svg-icons";
 
 /* add icons to the library */
-library.add(faMagnifyingGlass, faBell, faPlus);
+library.add(
+  faMagnifyingGlass,
+  faBell,
+  faPlus,
+  faBookmark,
+  faMobileScreenButton
+);
 
 createApp(App)
   .use(store)
