@@ -1,4 +1,5 @@
 <template>
+  <AnnouncementsFilter @search="search" :announcementType="announcementType" />
   <div class="announcements-list-container">
     <div class="table-responsive">
       <table class="table">
@@ -89,66 +90,55 @@
           ></font-awesome-icon>
         </div>
         <div class="page-item show-count">
-          Showing {{ start }}-{{
-            end > announcements.length ? announcements.length : end
+          Showing {{ announcementsData.length > 0 ? start : 0 }}-{{
+            end > announcementsData.length ? announcementsData.length : end
           }}
-          of {{ announcements.length }}
+          of {{ announcementsData.length }}
         </div>
       </div>
     </div>
   </div>
 </template>
 <script>
-import mockAnnouncements from "../../tests/mocks/mock-announcements.json";
-import moment from "moment";
-
+import AnnouncementsFilter from "@/components/AnnouncementsFilter.vue";
 export default {
   name: "AnnouncementsList",
+  components: {
+    AnnouncementsFilter,
+  },
   data() {
     return {
-      announcements: [],
+      announcementsData: [],
       filteredAnnouncements: [],
       current: 1,
       itemsPerPage: 10,
       start: 0,
       end: 10,
       length: 0,
+      draftsCount: 0,
+      filterBy: 0,
+      announcementType: [
+        {
+          text: "All",
+          value: 0,
+          count: 0,
+        },
+        {
+          text: "Drafts",
+          value: 1,
+          count: 0,
+        },
+      ],
     };
   },
+  props: ["announcements"],
   mounted() {
-    this.getAnnouncements();
+    this.announcementsData = this.announcements;
+    this.setAnnouncementTypeCount();
+    this.sort(1);
     this.paginate();
   },
   methods: {
-    getAnnouncements() {
-      // Map data to announcements
-      mockAnnouncements.map((announcement) => {
-        this.announcements.push({
-          id: announcement.id,
-          title: announcement.title,
-          message: announcement.message,
-          sender: `${announcement.sender
-            .split(" ")
-            .slice(-1)
-            .join(" ")}, ${announcement.sender
-            .split(" ")
-            .slice(0, -1)
-            .join(" ")}`,
-          sentThrough: announcement.sent_through,
-          dateCreated: moment(announcement.date_created).format("MM/DD/YYYY"),
-          startDate: moment(announcement.announcement_start_date).format(
-            "MM/DD/YYYY"
-          ),
-          startTIme: moment(announcement.announcement_start_date).format(
-            "hh:mm A"
-          ),
-          endDate: moment(announcement.announcement_end_date).format(
-            "MM/DD/YYYY"
-          ),
-          endTime: moment(announcement.announcement_end_date).format("hh:mm A"),
-        });
-      });
-    },
     paginate() {
       let limit = +this.itemsPerPage;
       let start = (this.current - 1) * limit;
@@ -156,14 +146,62 @@ export default {
       this.start = start + 1;
       this.end = end;
 
-      this.filteredAnnouncements = this.announcements?.slice(start, end);
-      this.length = Math.ceil(this.announcements.length / limit);
+      this.filteredAnnouncements = this.announcementsData?.slice(start, end);
+      this.length = Math.ceil(this.announcementsData.length / limit);
     },
     nextPage() {
       this.length !== this.current ? this.current++ : this.current;
     },
     prevPage() {
       this.current !== 1 ? this.current-- : this.current;
+    },
+    search({ value, index, filterBy }) {
+      console.log(filterBy);
+      this.current = 1;
+
+      // Filter for All announcement type
+      this.announcementsData = this.announcements.filter((announcement) => {
+        return (
+          announcement.title.toLowerCase().includes(value.toLowerCase()) ||
+          announcement.message.toLowerCase().includes(value.toLowerCase()) ||
+          announcement.sender.toLowerCase().includes(value.toLowerCase())
+        );
+      });
+      this.setAnnouncementTypeCount();
+
+      // Filter for Drafts type
+      if (index == 1) {
+        this.announcementsData = this.announcementsData.filter(
+          (announcement) => announcement.messageType === index
+        );
+      }
+
+      // Sort and paginate
+      if (+filterBy > 0) {
+        this.sort(+filterBy);
+      }
+      this.paginate();
+    },
+    setAnnouncementTypeCount() {
+      this.announcementType.forEach((type) => {
+        type.count =
+          type.value === 0
+            ? this.announcementsData.length
+            : this.announcementsData.filter(
+                (announcement) => announcement.messageType === type.value
+              ).length;
+      });
+    },
+    sort(filterBy) {
+      if (filterBy === 1) { // Latest to oldest
+        this.announcementsData = this.announcementsData.slice().sort(function (a, b) {
+          return new Date(b.dateCreated) - new Date(a.dateCreated)
+        });
+      } else if (filterBy === 2) { // Oldest to latest
+        this.announcementsData =  this.announcementsData.slice().sort(function (a, b) {
+          return new Date(a.dateCreated) - new Date(b.dateCreated)
+        });
+      }
     },
   },
   watch: {
@@ -246,6 +284,7 @@ export default {
       .paginate-buttons {
         display: flex;
         justify-content: center;
+        align-items: center;
 
         .fa-icon {
           margin: 0 8px;

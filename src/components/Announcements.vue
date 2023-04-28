@@ -17,19 +17,61 @@
         </button>
       </div>
     </div>
-    <AnnouncementsFilter />
-    <AnnouncementsList />
+    <AnnouncementsList
+      v-if="announcements.length > 0"
+      :announcements="announcements"
+    />
   </div>
 </template>
 <script>
-import AnnouncementsFilter from "@/components/AnnouncementsFilter.vue";
 import AnnouncementsList from "@/components/AnnouncementsList.vue";
+import mockAnnouncements from "../../tests/mocks/mock-announcements.json";
+import moment from "moment";
 
 export default {
   name: "Announcements",
   components: {
     AnnouncementsList,
-    AnnouncementsFilter,
+  },
+  data() {
+    return {
+      announcements: [],
+    };
+  },
+  mounted() {
+    this.getAnnouncements();
+  },
+  methods: {
+    getAnnouncements() {
+      // Map data to announcements
+      mockAnnouncements.map((announcement) => {
+        this.announcements.push({
+          id: announcement.id,
+          title: announcement.title,
+          message: announcement.message,
+          messageType: announcement.message_type,
+          sender: `${announcement.sender
+            .split(" ")
+            .slice(-1)
+            .join(" ")}, ${announcement.sender
+            .split(" ")
+            .slice(0, -1)
+            .join(" ")}`,
+          sentThrough: announcement.sent_through,
+          dateCreated: moment(announcement.date_created).format("MM/DD/YYYY"),
+          startDate: moment(announcement.announcement_start_date).format(
+            "MM/DD/YYYY"
+          ),
+          startTIme: moment(announcement.announcement_start_date).format(
+            "hh:mm A"
+          ),
+          endDate: moment(announcement.announcement_end_date).format(
+            "MM/DD/YYYY"
+          ),
+          endTime: moment(announcement.announcement_end_date).format("hh:mm A"),
+        });
+      });
+    },
   },
 };
 </script>
@@ -44,9 +86,6 @@ export default {
       span {
         font-size: 16px;
       }
-    }
-
-    .button-container {
     }
   }
 }
