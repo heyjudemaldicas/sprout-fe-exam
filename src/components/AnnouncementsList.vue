@@ -156,7 +156,6 @@ export default {
       this.current !== 1 ? this.current-- : this.current;
     },
     search({ value, index, filterBy }) {
-      console.log(filterBy);
       this.current = 1;
 
       // Filter for All announcement type
